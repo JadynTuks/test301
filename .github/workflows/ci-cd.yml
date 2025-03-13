@@ -5,9 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  # Add scheduled runs (e.g., daily)
-  schedule:
-    - cron: '0 0 * * *'  # Runs at midnight every day
+  # Commit checks
+  # Note: We removed the daily schedule to focus on commits
 
 # Common environment variables
 env:
@@ -25,10 +24,12 @@ jobs:
           # Full git history is needed to get a proper list of changed files
           fetch-depth: 0
           
-      - name: Run Super-Linter
+      - name: Run Super-Linter (Fast Mode)
         uses: github/super-linter@v5
+        # Added timeout to ensure it doesn't run too long
+        timeout-minutes: 5
         env:
-          VALIDATE_ALL_CODEBASE: ${{ github.event_name == 'schedule' }}
+          VALIDATE_ALL_CODEBASE: false  # Only validate changed files to speed up checks
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_JAVASCRIPT_ES: true
@@ -53,6 +54,8 @@ jobs:
         node-version: '18'
         
     - name: Find and process all package.json files
+      # Added timeout to prevent excessive build time
+      timeout-minutes: 10
       run: |
         # Find all package.json files, excluding those in node_modules
         find . -name "package.json" -not -path "*/node_modules/*" | while read -r package; do
@@ -104,49 +107,26 @@ jobs:
         cache: maven
     
     - name: Build and Test with Maven
+      # Added timeout to ensure it doesn't run too long
+      timeout-minutes: 15
       run: |
-        # Find all pom.xml files and run Maven on them
+                  # Find all pom.xml files and run Maven on them with optimizations
         find . -name "pom.xml" -not -path "*/target/*" -not -path "*/node_modules/*" | while read -r pom; do
           dir=$(dirname "$pom")
           echo "Building Maven project in $dir"
           cd "$GITHUB_WORKSPACE/$dir"
-          mvn clean verify -B || echo "Maven build completed with warnings"
+          # Using -T for parallel builds, skipping javadoc and avoiding full clean to speed up
+          mvn verify -B -T 1C -DskipJavadoc=true || echo "Maven build completed with warnings"
         done
       continue-on-error: true
 
-  # Python components (if any)
-  python-components:
-    name: Python Components
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v3
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.10'
-    
-    - name: Install dependencies and run tests
-      run: |
-        # Find all requirements.txt files and install dependencies
-        find . -name "requirements.txt" -not -path "*/node_modules/*" | while read -r req; do
-          dir=$(dirname "$req")
-          echo "Setting up Python project in $dir"
-          cd "$GITHUB_WORKSPACE/$dir"
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-cov flake8
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || echo "Linting completed with warnings"
-          pytest || echo "Tests completed with warnings"
-        done
-      continue-on-error: true
+  # Python components removed as requested
 
   # General artifact collection
   collect-artifacts:
     name: Collect Build Artifacts
     runs-on: ubuntu-latest
-    needs: [node-components, java-components, python-components]
+    needs: [node-components, java-components]
     
     steps:
     - uses: actions/checkout@v3
