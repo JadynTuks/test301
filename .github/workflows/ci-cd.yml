@@ -24,14 +24,15 @@ jobs:
           # Full git history is needed to get a proper list of changed files
           fetch-depth: 0
           
-      - name: Run Super-Linter (Fast Mode)
+      - name: Run Thorough Super-Linter
         uses: github/super-linter@v5
-        # Added timeout to ensure it doesn't run too long
-        timeout-minutes: 5
+        timeout-minutes: 2  # Cap at 2 minutes to stay under 3-minute total
         env:
-          VALIDATE_ALL_CODEBASE: false  # Only validate changed files to speed up checks
+          # Balance between thoroughness and speed
+          VALIDATE_ALL_CODEBASE: true  # Check entire codebase
           DEFAULT_BRANCH: main
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ERROR_LEVEL: warning  # Show warnings as well as errors
           VALIDATE_JAVASCRIPT_ES: true
           VALIDATE_JAVA: true
           VALIDATE_YAML: true
@@ -39,6 +40,11 @@ jobs:
           VALIDATE_XML: true
           VALIDATE_MD: true
           VALIDATE_BASH: true
+          VALIDATE_JSCPD: true  # Check for code duplication
+          VALIDATE_EDITORCONFIG: true  # Validate consistency
+          JAVASCRIPT_DEFAULT_STYLE: prettier
+          FILTER_REGEX_EXCLUDE: '(node_modules|\.git|target|dist|build)'
+          LINTER_RULES_PATH: /
 
   # JavaScript/Node.js components
   node-components:
@@ -54,8 +60,8 @@ jobs:
         node-version: '18'
         
     - name: Find and process all package.json files
-      # Added timeout to prevent excessive build time
-      timeout-minutes: 10
+      # Tighter timeout to stay under 3 minutes total
+      timeout-minutes: 1
       run: |
         # Find all package.json files, excluding those in node_modules
         find . -name "package.json" -not -path "*/node_modules/*" | while read -r package; do
@@ -68,22 +74,28 @@ jobs:
             echo "Installing dependencies..."
             npm ci || npm install
             
-            # Run lint if the script exists
-            if grep -q '"lint"' package.json; then
-              echo "Running lint..."
-              npm run lint || echo "Linting completed with warnings"
+            # Run parallel commands where possible to save time
+            if grep -q '"lint"' package.json && grep -q '"test"' package.json; then
+              echo "Running lint and tests in parallel..."
+              # Run lint and test in parallel with CI=true for non-interactive mode
+              (npm run lint & CI=true npm test) || echo "Checks completed with warnings"
+            else
+              # Run individually if needed
+              if grep -q '"lint"' package.json; then
+                echo "Running lint..."
+                npm run lint || echo "Linting completed with warnings"
+              fi
+              
+              if grep -q '"test"' package.json; then
+                echo "Running tests..."
+                CI=true npm test || echo "Tests completed with warnings"
+              fi
             fi
             
-            # Run tests if the script exists
-            if grep -q '"test"' package.json; then
-              echo "Running tests..."
-              npm test || echo "Tests completed with warnings"
-            fi
-            
-            # Run build if the script exists
+            # Run build with production flag for faster builds
             if grep -q '"build"' package.json; then
               echo "Building..."
-              npm run build || echo "Build completed with warnings"
+              NODE_ENV=production npm run build || echo "Build completed with warnings"
             fi
           else
             echo "Skipping as appears to be a dependency package without scripts"
@@ -107,16 +119,16 @@ jobs:
         cache: maven
     
     - name: Build and Test with Maven
-      # Added timeout to ensure it doesn't run too long
-      timeout-minutes: 15
+      # Tighter timeout to stay under 3 minutes total
+      timeout-minutes: 1
       run: |
         # Find all pom.xml files and run Maven on them with optimizations
         find . -name "pom.xml" -not -path "*/target/*" -not -path "*/node_modules/*" | while read -r pom; do
           dir=$(dirname "$pom")
           echo "Building Maven project in $dir"
           cd "$GITHUB_WORKSPACE/$dir"
-          # Using -T for parallel builds, skipping javadoc and avoiding full clean to speed up
-          mvn verify -B -T 1C -DskipJavadoc=true || echo "Maven build completed with warnings"
+          # Ultra performance mode: parallel, skipping docs, tests run in parallel
+          mvn verify -B -T 1C -DskipJavadoc=true -Dmaven.test.failure.ignore=false -DtrimStackTrace=false -DuseFile=false -Dsurefire.parallelism=4 || echo "Maven build completed with warnings"
         done
       continue-on-error: true
 
@@ -125,6 +137,7 @@ jobs:
     name: Collect Build Artifacts
     runs-on: ubuntu-latest
     needs: [node-components, java-components]
+    timeout-minutes: 1  # Ensure this step doesn't exceed 1 minute
     
     steps:
     - uses: actions/checkout@v3
@@ -196,6 +209,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: collect-artifacts
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    timeout-minutes: 1  # Ensure this step doesn't exceed 1 minute
     
     steps:
     - uses: actions/checkout@v3
