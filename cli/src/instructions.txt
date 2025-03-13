@@ -1,0 +1,6 @@
+1. Open any terminal(bash, powershell, cmd etc.)
+2. Run the "json-server --watch db.json --port 3000" command to run the json server
+- Ensure that all the required libraries are installed.
+3. Open another terminal to execute commands
+4. Type "mpdb help" to see the format for commands
+5. Interact with the cli
