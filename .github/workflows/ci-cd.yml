@@ -34,12 +34,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VALIDATE_JAVASCRIPT_ES: true
           VALIDATE_JAVA: true
-          VALIDATE_PYTHON: true
           VALIDATE_YAML: true
           VALIDATE_JSON: true
           VALIDATE_XML: true
           VALIDATE_MD: true
           VALIDATE_BASH: true
+
   # JavaScript/Node.js components
   node-components:
     name: Node.js Components
@@ -110,7 +110,7 @@ jobs:
       # Added timeout to ensure it doesn't run too long
       timeout-minutes: 15
       run: |
-                  # Find all pom.xml files and run Maven on them with optimizations
+        # Find all pom.xml files and run Maven on them with optimizations
         find . -name "pom.xml" -not -path "*/target/*" -not -path "*/node_modules/*" | while read -r pom; do
           dir=$(dirname "$pom")
           echo "Building Maven project in $dir"
@@ -119,8 +119,6 @@ jobs:
           mvn verify -B -T 1C -DskipJavadoc=true || echo "Maven build completed with warnings"
         done
       continue-on-error: true
-
-  # Python components removed as requested
 
   # General artifact collection
   collect-artifacts:
