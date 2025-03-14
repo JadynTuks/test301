@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import  Filter  from "../components/Filter";
+import Filter  from "../components/Filter";
 import LogicalOperator from "../components/LogicalOperator";
 import Update from "../components/Update";
+import "../styles/Query.css"
 // const dbClient = new NoSQLDBClient("https://TheAPIUrl:Port");
 // const registerData = {
 //     username: "newuser@example.com",
@@ -10,6 +11,149 @@ import Update from "../components/Update";
 
 const Query = (props) => {
     const [attributes] = useState(["engine", "model", "numberOfDoors", "year"])
+    const [mockDB,setMockDb] = useState( [
+        {
+            "name": "Cars",
+            "collections": [
+                {
+                    "name": "Audi",
+                    "documents": [
+                        { "model": "A3", "doors": 5, "body_type": "sedan" },
+                        { "model": "A4", "doors": 5, "body_type": "sedan" },
+                        { "model": "A6", "doors": 5, "body_type": "sedan" },
+                        { "model": "Q2", "doors": 5, "body_type": "hatchback" },
+                        { "model": "Q5", "doors": 5, "body_type": "SUV" },
+                        { "model": "Q7", "doors": 5, "body_type": "SUV" },
+                        { "model": "R8", "doors": 2, "body_type": "coupe" },
+                        { "model": "e-tron", "doors": 5, "body_type": "electric SUV" }
+                    ]
+                },
+                {
+                    "name": "BMW",
+                    "documents": [
+                        { "model": "Z4", "doors": 2, "body_type": "roadster" },
+                        { "model": "M3", "doors": 4, "body_type": "sedan" },
+                        { "model": "M4", "doors": 2, "body_type": "coupe" },
+                        { "model": "X1", "doors": 5, "body_type": "SUV" },
+                        { "model": "X3", "doors": 5, "body_type": "SUV" },
+                        { "model": "X5", "doors": 5, "body_type": "SUV" },
+                        { "model": "i4", "doors": 4, "body_type": "electric sedan" },
+                        { "model": "iX", "doors": 5, "body_type": "electric SUV" }
+                    ]
+                },
+                {
+                    "name": "Mercedes",
+                    "documents": [
+                        { "model": "C200", "doors": 4, "body_type": "sedan" },
+                        { "model": "E63", "doors": 4, "body_type": "sedan" },
+                        { "model": "S63", "doors": 4, "body_type": "luxury sedan" },
+                        { "model": "GLA 45", "doors": 5, "body_type": "SUV" },
+                        { "model": "GLC", "doors": 5, "body_type": "SUV" },
+                        { "model": "GLE 63", "doors": 5, "body_type": "SUV" },
+                        { "model": "AMG GT", "doors": 2, "body_type": "coupe" },
+                        { "model": "EQB", "doors": 5, "body_type": "electric SUV" }
+                    ]
+                },
+                {
+                    "name": "Tesla",
+                    "documents": [
+                        { "model": "Model S", "doors": 4, "body_type": "sedan" },
+                        { "model": "Model 3", "doors": 4, "body_type": "sedan" },
+                        { "model": "Model X", "doors": 5, "body_type": "SUV" },
+                        { "model": "Model Y", "doors": 5, "body_type": "SUV" },
+                        { "model": "Roadster", "doors": 2, "body_type": "sports" },
+                        { "model": "Cybertruck", "doors": 4, "body_type": "truck" }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Property Listing",
+            "collections":[
+                {
+                    "name":"properties",
+                    "documents": [
+                        {
+                            "_id": 1,
+                            "title": "Luxury Apartment in Downtown",
+                            "type": "Apartment",
+                            "price": 350000,
+                            "location": {
+                                "city": "New York",
+                                "state": "NY",
+                                "zipcode": "10001"
+                            },
+                            "bedrooms": 2,
+                            "bathrooms": 2,
+                            "size_sqft": 1200,
+                            "listed_date": "2024-03-01",
+                            "status": "Available",
+                            "agent_id": 201
+                        },
+                        {
+                            "_id": 2,
+                            "title": "Cozy Suburban House",
+                            "type": "House",
+                            "price": 450000,
+                            "location": {
+                                "city": "Los Angeles",
+                                "state": "CA",
+                                "zipcode": "90045"
+                            },
+                            "bedrooms": 3,
+                            "bathrooms": 2,
+                            "size_sqft": 1800,
+                            "listed_date": "2024-02-15",
+                            "status": "Under Contract",
+                            "agent_id": 202
+                        }
+                    ]
+                },
+                {
+                    "name":"agents",
+                    "documents": [
+                        {
+                            "_id": 201,
+                            "name": "John Realtor",
+                            "phone": "555-1234",
+                            "email": "john.realtor@example.com",
+                            "agency": "Dream Homes Realty"
+                        },
+                        {
+                            "_id": 202,
+                            "name": "Jane Property",
+                            "phone": "555-5678",
+                            "email": "jane.property@example.com",
+                            "agency": "Luxury Living Realtors"
+                        }
+                    ]
+                },
+                {
+                    name:"customers",
+                    documents: [
+                        {
+                            "_id": 301,
+                            "name": "Alice Buyer",
+                            "phone": "555-7890",
+                            "email": "alice.buyer@example.com",
+                            "interested_properties": [1, 2]
+                        },
+                        {
+                            "_id": 302,
+                            "name": "Bob Investor",
+                            "phone": "555-2468",
+                            "email": "bob.investor@example.com",
+                            "interested_properties": [2]
+                        }
+                    ]
+                }
+            ]
+        }
+
+    ])
+    
+    const [dbName, setDBName] = useState("")
+    const [colName, setColName] = useState("")
 
     
     const [filters,setFilters] = useState([])
@@ -36,6 +180,8 @@ const Query = (props) => {
     const jsonDataRef = React.createRef(); //references the input field for JSON data
 
     const onCommandChange =()=>{ //
+        setDBName("");
+        setColName("");
         setDatabaseDropdownState(false);
         setOptionNameState(false);
         setColletionDropdownState(false);
@@ -47,9 +193,7 @@ const Query = (props) => {
             case "create": {
                 setCreateOptionsState(true);
                 if (createOptionsRef.current)
-                    createOptionsRef.current.value = ""
-                console.log("Heree in command create");
-                
+                    createOptionsRef.current.value = ""                
                 break;
             }
             
@@ -77,10 +221,17 @@ const Query = (props) => {
     
     const onCreateOptionsChange = () =>{
         if (createOptionsRef.current.value.trim()!= ""){
-            setOptionNameState(true)
             if (optionNameRef.current)
                 optionNameRef.current.value = ""
-            setDatabaseDropdownState(false)
+            if(createOptionsRef.current.value === "collection") {
+                setDatabaseDropdownState(true)
+                setOptionNameState(false)
+            }
+            else{
+                setDatabaseDropdownState(false)
+                setOptionNameState(true)
+
+            }
             setColletionDropdownState(false)
             setFilterState(false)
             setJSONInputState(false)
@@ -90,8 +241,8 @@ const Query = (props) => {
 
     const onOptionsNameChange = () =>{
         if (createOptionsRef.current.value.trim() != "") {
-            setDatabaseDropdownState(false)
-            setColletionDropdownState(false)
+            // setDatabaseDropdownState(false)
+            // setColletionDropdownState(false)
             setFilterState(false)
             setUpdateState(false);
             setJSONInputState(false)
@@ -100,8 +251,16 @@ const Query = (props) => {
     }
 
     const onDatabaseNameChange = () =>{
-        if (databaseNameRef.current.value.trim() != ""){
-            setColletionDropdownState(true);
+        setColName("");
+        if (databaseNameRef.current.value.trim() != ""){            
+            setDBName(databaseNameRef.current.value.trim())
+            if(queryCommandRef.current.value != "create")
+                setColletionDropdownState(true);
+            else{
+                setOptionNameState(true)
+                setColletionDropdownState(false);
+                setSaveButtonState(false)
+            }
             if (collectionNameRef.current)
                 collectionNameRef.current.value = ""
             setFilterState(false);
@@ -121,7 +280,8 @@ const Query = (props) => {
     }
     
     const onCollectionNameChange = () =>{
-        if (databaseNameRef.current.value.trim() != ""){
+        if (collectionNameRef.current.value.trim() != ""){
+            setColName(collectionNameRef.current.value)
             if (queryCommandRef.current.value.trim() != "create" && queryCommandRef.current.value.trim()!="insert"){
                 setFilterState(true);
                 setFilters([])
@@ -188,75 +348,140 @@ const Query = (props) => {
     }
 
     const handleSave = () =>{
-        
-        // switch (queryCommandRef.current.value.trim()) {
-        //     case "create":{
-        //         if(createOptionsRef.current.value === "database"){
-        //             // dbClient.createDatabase({ dbName: optionNameRef.current.value})
-        //             // .then(result => {
-        //             //     console.log("Database created:", result);
-        //             // })
-        //         }
-        //         else {
-        //             // dbClient.createCollection({dbName: optionNameRef.current.value })
-        //             // .then(result => {
-        //             //     console.log("collection created:", result);
-        //             // })
-        //         }
-        //         break;
-        //     }
-        //     case "insert":{
-        //         const createDocData = {
-        //             dbName: databaseNameRef.current.value,
-        //             collectionName: collectionNameRef.current.value,
-        //             document: jsonDataRef.current.value,
-        //             token: "your-auth-token"
-        //         };
-
-        //         dbClient.createDocument(createDocData)
-        //         .then(result => {
-        //             console.log("Document created:", result);
-        //         })
-        //         .catch(err => {
-        //             console.error("Failed to create document:", err);
-        //         });
-        //     }
+        // console.log(mockDB.find(db => db.name.toLowerCase() === dbName).collections.find(col => col.name.toLowerCase() === colName).documents);
+        console.log("mockDB initial");
+        console.log(mockDB);
+        switch (queryCommandRef.current.value.trim()) {
             
-        //     case "update":{
-        //         const createDocData = {
-        //             dbName: databaseNameRef.current.value,
-        //             collectionName: collectionNameRef.current.value,
-        //             document: jsonDataRef.current.value,
-        //             token: "your-auth-token"
-        //         };
+            case "create":{
+                if(createOptionsRef.current.value === "database"){
+                    // dbClient.createDatabase({ dbName: optionNameRef.current.value})
+                    // .then(result => {
+                    //     console.log("Database created:", result);
+                    // })
 
-        //         dbClient.createDocument(createDocData)
-        //         .then(result => {
-        //             console.log("Document created:", result);
-        //         })
-        //         .catch(err => {
-        //             console.error("Failed to create document:", err);
-        //         });
-        //     }
+                    if(!mockDB.find(db => db.name.toLowerCase() === optionNameRef.current.value)){
+                        console.log("the db does not exist")
+                        mockDB.push({name:optionNameRef.current.value})
+                        optionNameRef.current.value = ""
+                        console.log("optionNameRef.current.value")
+                        console.log(optionNameRef.current.value)
+                    }
 
-        //     case "update":{
-        //         const createDocData = {
-        //             dbName: databaseNameRef.current.value,
-        //             collectionName: collectionNameRef.current.value,
-        //             document: jsonDataRef.current.value,
-        //             token: "your-auth-token"
-        //         };
+                }
+                else {
+                    // dbClient.createCollection({dbName: optionNameRef.current.value })
+                    // .then(result => {
+                    //     console.log("collection created:", result);
+                    // })
 
-        //         dbClient.createDocument(createDocData)
-        //         .then(result => {
-        //             console.log("Document created:", result);
-        //         })
-        //         .catch(err => {
-        //             console.error("Failed to create document:", err);
-        //         });
-        //     }
+                    if(!mockDB.find(db => db.name.toLowerCase() === optionNameRef.current.value)) {
+                        console.log("the db does not exist")
+                        let database = mockDB.find(database => database.name.toLowerCase() === dbName);
+                        if(database){
+                            if(database.collections){
+                                database.collections.push({ name: optionNameRef.current.value });
+                            }
+                            else{
+                                database.collections = [{ name: optionNameRef.current.value }];
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            case "insert":{
+                // const createDocData = {
+                //     dbName: databaseNameRef.current.value,
+                //     collectionName: collectionNameRef.current.value,
+                //     document: jsonDataRef.current.value,
+                //     token: "your-auth-token"
+                // };
 
-        // }
+                // dbClient.createDocument(createDocData)
+                // .then(result => {
+                //     console.log("Document created:", result);
+                // })
+                // .catch(err => {
+                //     console.error("Failed to create document:", err);
+                // });
+                mockDB.find(db => db.name.toLowerCase() === dbName).collections.find(col => col.name.toLowerCase() === colName).documents?
+                    mockDB.find(db => db.name.toLowerCase() === dbName).collections.find(col => col.name.toLowerCase() === colName).documents.push(JSON.parse(jsonDataRef.current.value))
+                : mockDB.find(db => db.name.toLowerCase() === dbName).collections.find(col => col.name.toLowerCase() === colName).documents = [JSON.parse(jsonDataRef.current.value)]
+                alert("Added Successfully!")
+                break;
+            }
+            
+            case "delete":{
+                if(colName === ""){
+                    var dbCopy = mockDB;
+
+                    
+                    setMockDb((mockDB.filter(db => db.name.toLowerCase() !== dbName)))
+                    alert(dbName+ " deleted successfully")
+                    
+                    if(queryCommandRef.current)
+                        queryCommandRef.current.value = ""
+
+                    if (databaseNameRef.current)
+                        databaseNameRef.current.value = ""    
+
+                    if (collectionNameRef.current)
+                        collectionNameRef.current.value = ""
+
+                    
+
+                }
+                else{
+                    if(filters.length === 0){
+                        let database = mockDB.find(database => database.name.toLowerCase() === dbName);
+
+                        if (database) {
+                            // Filter out the collection with the specified name
+                            database.collections = database.collections.filter(collection => collection.name.toLowerCase() !== colName);
+                            if (queryCommandRef.current)
+                                queryCommandRef.current.value = ""
+                            
+                            if (databaseNameRef.current)
+                                databaseNameRef.current.value = ""
+                            
+                            if (collectionNameRef.current)
+                                collectionNameRef.current.value = ""
+                            alert(colName+" deleted successfully")
+                        }
+                        
+                    }
+                }
+            }
+
+            // case "update":{
+            //     const createDocData = {
+            //         dbName: databaseNameRef.current.value,
+            //         collectionName: collectionNameRef.current.value,
+            //         document: jsonDataRef.current.value,
+            //         token: "your-auth-token"
+            //     };
+
+            //     dbClient.createDocument(createDocData)
+            //     .then(result => {
+            //         console.log("Document created:", result);
+            //     })
+            //     .catch(err => {
+            //         console.error("Failed to create document:", err);
+            //     });
+            // }
+
+        }
+
+        setDBName("");
+        setColName("");
+        setDatabaseDropdownState(false);
+        setOptionNameState(false);
+        setColletionDropdownState(false);
+        setFilterState(false);
+        setUpdateState(false);
+        setJSONInputState(false);
+        setSaveButtonState(false)
     }
     
 
@@ -280,7 +505,7 @@ const Query = (props) => {
                 createOptionsState?
                 <div className="query-section">
                         <label className="section-label">Create a new:</label>
-                    <select id="create-options-dropdown" className="dropdown" defaultValue="" ref={createOptionsRef} onChange={onCreateOptionsChange}>
+                        <select id="create-options-dropdown" className="dropdown" defaultValue="" ref={createOptionsRef} onChange={onCreateOptionsChange}>
                             <option value="" disabled>Choose what to create</option>
                             <option value="database">Database</option>
                             <option value="collection">Collection</option>
@@ -295,7 +520,12 @@ const Query = (props) => {
                     <label className="section-label" >Select a database:</label>
                     <select id="database-dropdown" className="dropdown" defaultValue="" ref={databaseNameRef} onChange={onDatabaseNameChange}>
                         <option value="" disabled>Choose a database</option>
-                        <option value="cars">Cars</option>
+                        {
+                            mockDB.map(db=>{
+                                return <option value={`${db.name.toLowerCase()}`}>{db.name}</option>
+                            })
+                        }
+                        
                     </select>
                 </div>
                 :null
@@ -317,9 +547,15 @@ const Query = (props) => {
                     <label className="section-label">Select a collection:</label>
                     <select id="colletion-dropdown" className="dropdown" defaultValue="" ref={collectionNameRef} onChange={onCollectionNameChange}>
                         <option value="" disabled>Choose a collection</option>
-                        <option value="audi">Audi</option>
-                        <option value="mercedes">Mercedes</option>
-                        <option value="bmw">BMW</option>
+                            {console.log("collections of the curr db " +dbName, mockDB.find(db => db.name.toLowerCase() == dbName))}
+                        {    
+                            
+                                mockDB.find(db => db.name.toLowerCase() == dbName).collections?
+                                mockDB.find(db => db.name.toLowerCase() == dbName).collections.map(col=>{
+                                    return <option value={col.name.toLowerCase()}>{col.name}</option>
+                                })
+                                :null
+                        }
                     </select>
                 </div>
                 :null
@@ -382,8 +618,8 @@ const Query = (props) => {
                 <div id="json-data-wrapper" className="query-section">
                     <center>
                         <h4>Write JSON data to add to the collection</h4>
-                        <div>
-                            <textarea cols={80} rows={15} ref={jsonDataRef} onChange={validateJSONInput}></textarea>
+                        <div id="json-input-container">
+                            <textarea id="json-input" cols={80} rows={15} ref={jsonDataRef} onChange={validateJSONInput}></textarea>
                         </div>
                     </center>
                 </div>
@@ -399,3 +635,4 @@ const Query = (props) => {
 };
 
 export default Query;
+

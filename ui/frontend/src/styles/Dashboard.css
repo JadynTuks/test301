@@ -1,0 +1,283 @@
+/* Dashboard.css */
+
+/* General Styles */
+body {
+  background-color: #121212; /* black */
+  color: #e0e0e0; /* light text */
+  font-family: 'Arial', sans-serif;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #121212; /* black */
+}
+
+/* main content styles */
+.main-content {
+  background-color: #1f1f1f; /* dark gray */
+  color: #e0e0e0; /* light text */
+  padding: 24px;
+}
+
+.logo-section {
+  background-color: #333333; /* dark gray */
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 16px;
+  color: #ffffff;
+  font-size: 1.5rem;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  font-family: 'Arial', sans-serif;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+.stats-section h2 {
+  font-size: 1.5rem; 
+  font-weight: bold;
+  font-family: 'Arial', sans-serif !important;
+  margin-bottom: 16px;
+  color: #ffffff;
+}
+
+.stats-section {
+  margin-bottom: 32px;
+}
+
+/* Grid layouts */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+/* system stats specific grid */
+.system-stats-grid {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 800px;
+  margin: 0 auto 24px auto;
+}
+
+/* charts container layout */
+.charts-container {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.charts-container.horizontal {
+  flex-direction: row;
+}
+
+/* chart wrapper for centering */
+.chart-wrapper {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+/* stat boxes styling */
+.stat-box {
+  background-color: #424242; /* lighter gray */
+  padding: 24px 16px;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.3); 
+  transition: background-color 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* centers content vert. */
+  align-items: center; /* centers content horiz. */
+  height: 120px; /* fixed height for uniformity */
+}
+
+.stat-box:hover {
+  background-color: #673ab7; /* purple on hover */
+}
+
+.stat-box .stat-title {
+  font-size: 0.875rem;
+  color: #ffffff;
+  margin-bottom: 12px; /* spacing between title & val. */
+  width: 100%; 
+  text-align: center;
+}
+
+.stat-box .stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #202020; /* dark gray */
+  width: 100%; 
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* pie-chart section */
+.pie-chart-container {
+  background-color: #424242; /* lighter gray */
+  padding: 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 6px 6px rgba(0, 0, 0, 0.3); 
+  transition: background-color 0.3s ease; /* for smooth hover effect */
+  grid-column: span 1;
+  grid-row: span 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pie-chart-container:hover {
+  background-color: #673ab7; /* purple on hover*/
+}
+
+.pie-chart-container span {
+  font-size: 0.875rem;
+  color: #ffffff;
+  margin-bottom: 8px;
+  display: block; 
+  text-align: center;
+}
+
+.pie-chart-container .recharts-wrapper {
+  margin: 0 auto;
+}
+
+/* CRUD Bar Chart Section */
+.crud-chart-container {
+  background-color: #424242; /* lighter gray */
+  padding: 24px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  margin-top: 0; /* removed top margin - charts are side by side now */
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 45%; /* reduced width to fit side by side */
+  min-width: 400px; /* minimum width for the chart */
+}
+
+.crud-chart-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Bar Chart Title */
+.crud-chart-container h2 {
+  font-size: 1.5rem; 
+  font-weight: bold;
+  font-family: 'Arial', sans-serif !important;
+  color: #ffffff;
+  margin-bottom: 16px;
+}
+
+/* Bar Chart Styling */
+.crud-chart-container .recharts-wrapper {
+  margin: 0 auto;
+}
+
+/* Top Users Chart specific styling */
+.top-users-chart .recharts-cartesian-axis-tick-value {
+  font-size: 10px;
+}
+
+/* Responsive styles */
+@media (max-width: 1200px) {
+  .grid-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .pie-chart-container {
+    grid-column: span 1;
+    grid-row: span 2;
+  }
+  
+  .charts-container.horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  
+  .crud-chart-container {
+    width: 45%;
+    min-width: 380px;
+  }
+}
+
+@media (max-width: 900px) {
+  .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .system-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .charts-container.horizontal {
+    flex-direction: column;
+  }
+  
+  .crud-chart-container {
+    width: 90%;
+    max-width: 500px;
+    margin-bottom: 20px;
+  }
+}
+
+@media (max-width: 600px) {
+  .crud-chart-container {
+    width: 100%;
+    padding: 12px;
+    min-width: unset;
+  }
+
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .system-stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-box {
+    height: auto;
+    min-height: 100px;
+  }
+
+  .stat-box .stat-title {
+    font-size: 0.75rem;
+  }
+
+  .stat-box .stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .pie-chart-container {
+    grid-column: span 1;
+    grid-row: span 1;
+  }
+}
+
+/* for smaller screens - ensure charts remain visible */
+@media (max-width: 768px) {
+  .recharts-wrapper {
+    width: 100% !important;
+    height: auto !important;
+  }
+  
+  .top-users-chart .recharts-wrapper {
+    max-width: 100%;
+  }
+  
+  .charts-container {
+    width: 100%;
+  }
+}

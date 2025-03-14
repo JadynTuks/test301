@@ -1,0 +1,165 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+
+  .admin-user-page-wrapper 
+  {
+    background: #121212; /* linear-gradient(to right, #1e1e2f, #29293d); */
+    color: white;
+    display: flex; 
+    /*flex-direction: column; /* Stack the content vertically */
+    justify-content: center; /* Vertically center the content */
+    align-items: center; /* Horizontally center the content */
+    min-height: 100vh; /* Ensure body takes up at least the full height */
+    padding: 20px;
+    margin: 0;
+    width: 100%;
+  }
+
+  .container, .normal-user-page, .admin-user-page 
+  {
+    width: 100%; /* Set width to 100% */
+    max-width: 1200px; 
+    margin: 0 auto; /*centres*/
+  }
+
+  /*AdminUserPage */
+
+  .admin-user-page 
+  {
+    background: linear-gradient(to right, #0f0f1a, #2e2e3d);
+    display: flex;
+    justify-content: space-between;
+    /* background: rgba(0, 0, 0, 0.8); */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 1200px; /* for responsiveness */
+    min-height: 400px; 
+    min-width: 800px;
+  }
+  
+  /* Left Section: Search and Table */
+  .admin-user-page .left-section 
+  {
+    flex: 0.7;
+  }
+  
+  .admin-user-page .left-section input 
+  {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background: #333;
+    color: white;
+    font-size: 14px;
+  }
+  
+  .admin-user-page .left-section table 
+  {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .admin-user-page .left-section th, 
+  .admin-user-page .left-section td 
+  {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #555;
+  }
+  
+  .admin-user-page .left-section th 
+  {
+    background-color: #4a90e2;
+    color: white;
+  }
+  
+  .admin-user-page .left-section td 
+  {
+    background-color: #333;
+    color: white;
+  }
+  
+  .admin-user-page .left-section select 
+  {
+    width: 100%;
+    padding: 5px;
+    background: #333;
+    color: white;
+    border-radius: 5px;
+    border: 1px solid #555;
+  }
+  
+  /* Vertical divider */
+  .admin-user-page .divider 
+  {
+    width: 1px;
+    background-color: white;
+    margin: 0 20px;
+  }
+  
+  /* Right Section: User Details */
+  .admin-user-page .right-section 
+  {
+    flex: 0.3;
+    text-align: center;
+  }
+  
+  .admin-user-page .right-section h2 
+  {
+    margin-bottom: 20px;
+    color: #7d5fff;
+    font-size: 24px;
+  }
+  
+  .admin-user-page .right-section p 
+  {
+    font-size: 18px;
+    color: #aaa;
+    margin: 10px 0;
+    text-align: left;
+  }
+  
+  /* Buttons */
+  .admin-user-page .right-section button 
+  {
+    width: 80%;
+    margin-top: 15px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+  
+  .admin-user-page .right-section button[type="submit"] 
+  {
+    background: #4a90e2;
+    color: white;
+  }
+  
+  .admin-user-page .right-section button[type="submit"]:hover 
+  {
+    background: #3572b0;
+  }
+
+  .admin-user-page .right-section button[type="submit"]:last-child 
+  {
+    background: #c0392b; 
+    color: white;
+  }
+
+  .admin-user-page .right-section button[type="submit"]:last-child:hover 
+  {
+    background: #e74c3c; 
+  }

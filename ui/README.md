@@ -14,13 +14,12 @@ This document provides details on the MPDB-Studio web-based UI that interacts wi
    - [Users Page](#users-page)
 4. [Features & Functionality](#features--functionality)
 5. [UI Component Architecture](#ui-component-architecture)
-6. [State Management](#state-management)
-7. [API Integration](#api-integration)
-8. [Authentication Flow](#authentication-flow)
-9. [Usage Examples](#usage-examples)
-10. [Development Guide](#development-guide)
-11. [Testing](#testing)
-12. [Contributing](#contributing)
+6. [API Integration](#api-integration)
+7. [Authentication Flow](#authentication-flow)
+8. [Usage Examples](#usage-examples)
+9. [Development Guide](#development-guide)
+10. [Testing](#testing)
+11. [Contributing](#contributing)
 
 ## Overview
 
@@ -41,10 +40,10 @@ Ensure you have the following installed on your system:
 1. Clone the Repository:
 To get started, clone the UI repository:
 - git clone https://github.com/COS301-SE-2025/MP6.git
-- cd mpdb-studio
+- cd UI
 
 2. Install Dependencies
-Use npm to install the required dependencies:
+(Use npm)
 - npm install
 
 3. Running the Development Server
@@ -135,11 +134,6 @@ components/ - Contains reusable UI components (e.g. navbar)
 pages/ - Houses the five main pages
 
 services/ - Handles API calls to MPDB backend
-
-
-## State Management
-
-[Explanation of how state is managed across the application, including authentication state, selected databases/collections, etc.]
 
 
 ## API Integration

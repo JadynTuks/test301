@@ -1,0 +1,85 @@
+/* src/styles/Navbar.css */
+
+/* navbar styles */
+.navbar {
+  background-color: #181818; /* dark gray */
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar .buttons button {
+  background-color: #333333; /* dark gray */
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.navbar .brand {
+  font-size: 1.25rem;
+  font-weight: bold;
+  /*color: #00bcd4;  blue  */
+  color: #00008B;
+}
+
+  .mpdb-studio {
+    font-size: 1.9rem;
+    font-weight: bold;
+    font-family: 'Arial', sans-serif !important;
+    color: #ffffff;
+  }
+
+  .logo {
+    height: 60px; 
+    margin-right: 60px;
+    margin-right: 30px;
+    border-radius: 70%; /* creates circular crop */
+    object-fit: cover;  /* ensures image fills circle */
+  }
+  
+  .buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  
+  
+  .navbar-button:hover {
+    /* background-color: #888; */
+    background-color:#7B68EE !important;
+  }
+  
+
+
+
+
+
+  /*.navbar-button {
+    padding: 10px 20px;
+    background-color: #555;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  } 
+    */
+
+  /*
+    .brand {
+      color: white;
+      font-size: 24px;
+      font-weight: bold;
+    } 
+    */
+
+  /*
+  
+  .navbar .buttons button:hover {
+    background-color: #00008B;
+  }
+  */

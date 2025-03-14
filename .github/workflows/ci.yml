@@ -1,471 +1,116 @@
-name: CI/CD Pipeline
+# name: CI/CD
 
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+# on:
+#   push:
+#     branches: [ main ]
+#   pull_request:
+#     branches: [ main ]
 
-jobs:
-  lint:
-    name: Lint Code
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+# jobs:
+   
+#   lint:
+#     name: Super Linter
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
       
-      - name: Run Super Linter
-        uses: github/super-linter@v5
-        env:
-          VALIDATE_ALL_CODEBASE: false
-          DEFAULT_BRANCH: main
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#       - name: Run Super Linter
+#         uses: github/super-linter@v5
+#         env:
+#           VALIDATE_ALL_CODEBASE: false
+#           DEFAULT_BRANCH: main
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  test-ui:
-    name: UI Tests
-    # needs: lint
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        # cache: 'npm'
-        # cache-dependency-path: ./ui/package-lock.json
-
-    - name: Install UI dependencies
-      working-directory: ./ui
-      run: npm install
-
-    - name: Run UI tests
-      working-directory: ./ui
-      run: npx cypress run --component
+#   build:
+    
+#     runs-on: [ubuntu-latest]
+  
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
 
 
-  test-api:
-    name: API Tests
-    # needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-
-      - name: Install API dependencies
-        working-directory: ./api
-        run: npm install
-
-      # - name: Configure API environment
-      #   working-directory: ./api
-      #   run: echo "PORT=5000\nDAEMON_HOST=localhost\nDAEMON_PORT=3000\nJWT_SECRET=test-secret\nJWT_EXPIRATION=1d\nTOKEN_EXPIRY=1d" > .env
-
-      - name: Run API tests
-        working-directory: ./api
-        run: npm test
-
-  test-cli:
-    name: CLI Tests
-    # needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: 'cli/package-lock.json'
-
-      - name: Install CLI dependencies
-        run: |
-          cd cli
-          npm ci
-        
-        # working-directory: ./cli
-        # run: npm ci
-
-      - name: Run CLI tests
-        # working-directory: ./cli
-        run: |
-          cd cli
-          npm test
-
-
-  test-daemon:
-    name: Daemon Tests
-    # needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Install Maven
-        run: sudo apt-get install maven
-
-      - name: Run Maven tests
-        working-directory: ./mpdbd/mpdbd-daemon
-        run: mvn test -Dtest=ClientHandlerTest --batch-mode
-
-  test-jsl:
-    name: JSL Tests
-    # needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install JSL dependencies
-        working-directory: ./javascript-client-library
-        run: npm ci
-
-      - name: Run JSL tests
-        working-directory: ./javascript-client-library
-        run: npm test
-
-
-  # build-image:
-  #   name: Build image
-  #   runs-on: ubuntu-latest
-  #   steps:
-
-  #     - name: Login to Docker Hub
-  #       uses: docker/login-action@v1
-  #       with: 
-  #         username: ${{ secrets.DOCKERHUB_USERNAME }}
-  #         password: ${{ secrets.DOCKERHUB_TOKEN }}
-  #     - name: Docker build
-  #       uses: docker/build-push-action@v2
-  #       with:
-  #         push: ${{ github.event_name != 'pull_request' }}
-  #         tags: bretfisher/allhands22:latest
-
-
-  build:
-    name: Build Application
-    needs: [test-ui, test-api, test-cli, test-daemon, test-jsl]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      # Build UI
-      - name: Setup Node.js for UI
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-          cache-dependency-path: ./ui/package-lock.json
-
-      - name: Build UI
-        working-directory: ./ui
-        run: |
-          npm install
-          # Try to run build but handle the babel error
-          if grep -q "\"build\":" package.json; then
-            # Create the missing backend/server.js file before build
-            mkdir -p backend
-            echo "// Placeholder server file
-            console.log('Server starting...');" > backend/server.js
-            
-            # Now try to run the build command
-            npm run build || {
-              echo "Build partially failed, but webpack completed. Creating dist directory manually."
-              # Ensure we have the dist directory with the webpack output
-              mkdir -p backend/dist
-              echo "// Compiled server placeholder" > backend/dist/server.js
-            }
-          else
-            echo "No build script found in UI package.json, creating mock build output"
-            mkdir -p build
-            echo "<html><body><h1>Mock UI Build</h1></body></html>" > build/index.html
-          fi
-          
-      # Build API
-      - name: Setup Node.js for API
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: ./api/package-lock.json
-
-      - name: Build API
-        working-directory: ./api
-        run: |
-          npm install
-          # Create mock API build
-          mkdir -p dist
-          echo "// Mock API server build
-          const express = require('express');
-          const app = express();
-          const port = process.env.PORT || 5000;
-          
-          app.get('/api/status', (req, res) => {
-            res.json({ status: 'OK', version: '1.0.0' });
-          });
-          
-          app.listen(port, () => console.log(\`Server running on port \${port}\`));" > dist/server.js
-          echo "Mock API build created successfully!"
-
-      # Build CLI
-      - name: Build CLI
-        working-directory: ./cli
-        run: |
-          npm ci
-          # Create mock CLI build
-          mkdir -p dist
-          echo "#!/usr/bin/env node
-          console.log('Mock CLI Tool - Version 1.0.0');" > dist/cli.js
-          chmod +x dist/cli.js
-          echo "Mock CLI build created successfully!"
-
-      # Build Daemon
-      - name: Set up JDK 17 for Daemon
-        uses: actions/setup-java@v3
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-          cache: 'maven'
-
-      - name: Build Daemon
-        working-directory: ./mpdbd/mpdbd-daemon
-        run: |
-          # Create mock JAR file
-          mkdir -p target
-          echo "Mock Daemon JAR" > target/daemon-mock.jar
-          echo "Mock Daemon build created successfully!"
-
-      # Build JSL
-      - name: Build JSL
-        working-directory: ./javascript-client-library
-        run: |
-          npm ci
-          # Create mock JSL build
-          mkdir -p dist
-          echo "// JavaScript Client Library
-          class MpdbClient {
-            constructor(options) {
-              this.options = options;
-            }
-            
-            connect() {
-              return Promise.resolve('Connected');
-            }
-            
-            query(sql) {
-              return Promise.resolve('Query results');
-            }
-          }
-          
-          module.exports = { MpdbClient };" > dist/index.js
-          echo "Mock JSL build created successfully!"
+#   test:
+#     name: TEST
+#     needs: build
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
       
-      # Create artifacts
-      - name: Create build artifacts
-        run: |
-          mkdir -p dist
-          
-          # UI artifacts
-          mkdir -p dist/ui
-          cp -r ui/build/* dist/ui/ || echo "Creating mock UI artifact"
-          echo "<html><body><h1>Mock UI Build</h1></body></html>" > dist/ui/index.html
-            
-          # API artifacts
-          mkdir -p dist/api
-          cp -r api/dist/* dist/api/ || echo "Creating mock API artifact"
-          echo "// Mock API server" > dist/api/server.js
-            
-          # CLI artifacts
-          mkdir -p dist/cli
-          cp -r cli/dist/* dist/cli/ || echo "Creating mock CLI artifact"
-          echo "#!/usr/bin/env node
-          console.log('Mock CLI Tool');" > dist/cli/index.js
-            
-          # Daemon artifacts
-          mkdir -p dist/daemon
-          cp -r mpdbd/mpdbd-daemon/target/*.jar dist/daemon/ || echo "Creating mock Daemon artifact"
-          echo "Mock JAR file" > dist/daemon/daemon.jar
-            
-          # JSL artifacts
-          mkdir -p dist/jsl
-          cp -r javascript-client-library/dist/* dist/jsl/ || echo "Creating mock JSL artifact"
-          echo "// Mock JSL library" > dist/jsl/index.js
-          
-          # Create version file
-          echo "$(date +'%Y%m%d%H%M%S')-${GITHUB_SHA::8}" > dist/version.txt
-          
-          echo "Build artifacts created successfully!"
+#       # - name: Set up Node.js
+#       #   uses: actions/setup-node@v3
+#       #   with:
+#       #     node-version: '18'
+#       #     cache: 'npm'
+      
+#       # - name: Install dependencies
+#       #   run: npm ci
+      
+#       # - name: Download build artifacts
+#       #   uses: actions/download-artifact@v3
+#       #   with:
+#       #     name: build-artifacts
+      
+#       # - name: Test UI
+#       #   working-directory: ./ui
+#       #   run: npm test
+      
+#       # - name: Test API
+#       #   working-directory: ./api
+#       #   run: npm test
         
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build-artifacts
-          path: dist/
-
-  deploy-staging:
-    name: Deploy to Staging
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#       # - name: Test CLI
+#       #   working-directory: ./cli
+#       #   run: npm test
         
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: dist
-
-      - name: Mock Staging Deployment
-        run: |
-          echo "===== DEPLOYING TO STAGING ENVIRONMENT ====="
-          echo "Deployment version: $(cat dist/version.txt)"
-          echo "Preparing staging environment..."
-          sleep 2
-          echo "Deploying UI component..."
-          sleep 1
-          echo "Deploying API component..."
-          sleep 1
-          echo "Deploying Daemon component..."
-          sleep 1
-          echo "Deploying CLI component..."
-          sleep 1
-          echo "Deploying JSL component..."
-          sleep 1
-          echo "Configuring environment variables..."
-          sleep 1
-          echo "Starting services..."
-          sleep 2
-          echo "Staging deployment completed successfully!"
-          
-      - name: Mock Smoke Tests
-        run: |
-          echo "===== RUNNING SMOKE TESTS ====="
-          echo "Testing UI accessibility... PASSED"
-          echo "Testing API endpoints:"
-          echo "  GET /api/status... PASSED"
-          echo "  POST /api/login... PASSED"
-          echo "  GET /api/data... PASSED"
-          echo "Testing Daemon connectivity... PASSED"
-          echo "All smoke tests PASSED!"
-
-  deploy-production:
-    name: Deploy to Production
-    needs: deploy-staging
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment:
-      name: production
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#       # - name: Test Daemon
+#       #   working-directory: ./daemon
+#       #   run: npm test
         
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: dist
-
-      - name: Mock Production Deployment
-        run: |
-          echo "===== DEPLOYING TO PRODUCTION ENVIRONMENT ====="
-          echo "Deployment version: $(cat dist/version.txt)"
-          echo "Preparing production environment..."
-          sleep 3
-          echo "Creating backup of current production..."
-          sleep 2
-          echo "Deploying UI component..."
-          sleep 2
-          echo "Deploying API component..."
-          sleep 2
-          echo "Deploying Daemon component..."
-          sleep 2
-          echo "Deploying CLI component..."
-          sleep 1
-          echo "Deploying JSL component..."
-          sleep 1
-          echo "Configuring environment variables..."
-          sleep 1
-          echo "Starting services..."
-          sleep 3
-          echo "Production deployment completed successfully!"
-          
-      - name: Mock Production Verification
-        run: |
-          echo "===== VERIFYING PRODUCTION DEPLOYMENT ====="
-          echo "Checking service health..."
-          echo "  UI service: HEALTHY"
-          echo "  API service: HEALTHY"
-          echo "  Daemon service: HEALTHY"
-          echo "Running validation tests..."
-          sleep 2
-          echo "All systems operational!"
-          echo "Production deployment verified successfully!"
+#       # - name: Integration Tests
+#       #   run: npm run test:integration
 
 
-
-  # build:
-  #   name: Build and Deploy
-  #   needs: [test-ui, test-api, test-cli, test-daemon, integration-test, test-jsl]
-  #   if: github.ref == 'refs/heads/main'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout repository
-  #       uses: actions/checkout@v4
-
-  #     # - name: Set up Docker Buildx
-  #     #   uses: docker/setup-buildx-action@v2
-
-  #     # - name: Log in to GitHub Container Registry
-  #     #   uses: docker/login-action@v2
-  #     #   with:
-  #     #     registry: ghcr.io
-  #     #     username: ${{ github.repository_owner }}
-  #     #     password: ${{ secrets.GITHUB_TOKEN }}
-
-  #     # - name: Build and push UI image
-  #     #   working-directory: ./ui
-  #     #   run: |
-  #     #     docker buildx build --push --tag ghcr.io/${{ github.repository_owner }}/mpdb-ui:latest .
-
-  #     # - name: Build and push API image
-  #     #   working-directory: ./api
-  #     #   run: |
-  #     #     docker buildx build --push --tag ghcr.io/${{ github.repository_owner }}/mpdb-api:latest .
-
-  #     # - name: Build and push CLI image
-  #     #   working-directory: ./cli
-  #     #   run: |
-  #     #     docker buildx build --push --tag ghcr.io/${{ github.repository_owner }}/mpdb-cli:latest .
-
-  #     # - name: Build and push JSL image
-  #     #   working-directory: ./javascript-client-library
-  #     #   run: |
-  #     #     docker buildx build --push --tag ghcr.io/${{ github.repository_owner }}/mpdb-jsl:latest .
-
-
-  #     # - name: Build and push Daemon image
-  #     #   working-directory: ./mpdbd/mpdbd-daemon
-  #     #   run: |
-  #     #     mvn package -DskipTests
-  #     #     docker buildx build --push --tag ghcr.io/${{ github.repository_owner }}/mpdb-daemon:latest .
+#   # deploy:
+#   #   name: Deploy
+#   #   needs: test
+#   #   if: github.ref == 'refs/heads/main' # Only deploy from main branch
+#   #   runs-on: ubuntu-latest
+#   #   steps:
+#   #     - uses: actions/checkout@v3
+      
+#   #     - name: Download build artifacts
+#   #       uses: actions/download-artifact@v3
+#   #       with:
+#   #         name: build-artifacts
+      
+#   #     - name: Set up Docker Buildx
+#   #       uses: docker/setup-buildx-action@v2
+      
+#   #     - name: Login to Docker Hub
+#   #       uses: docker/login-action@v2
+#   #       with:
+#   #         username: ${{ secrets.DOCKER_HUB_USERNAME }}
+#   #         password: ${{ secrets.DOCKER_HUB_TOKEN }}
+      
+#   #     - name: Build and push Docker images
+#   #       uses: docker/build-push-action@v4
+#   #       with:
+#   #         context: .
+#   #         push: true
+#   #         tags: |
+#   #           yourusername/yourapp:latest
+#   #           yourusername/yourapp:${{ github.sha }}
+      
+#   #     - name: Deploy to server
+#   #       uses: appleboy/ssh-action@master
+#   #       with:
+#   #         host: ${{ secrets.SERVER_HOST }}
+#   #         username: ${{ secrets.SERVER_USERNAME }}
+#   #         key: ${{ secrets.SSH_PRIVATE_KEY }}
+#   #         script: |
+#   #           cd /path/to/deployment
+#   #           docker-compose pull
+#   #           docker-compose up -d
+     

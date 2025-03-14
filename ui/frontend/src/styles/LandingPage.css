@@ -1,0 +1,133 @@
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+  }
+
+  .Landing-wrapper 
+  {
+    background: #121212; /* linear-gradient(to right, #1e1e2f, #29293d); */
+    color: white;
+    display: flex; 
+    /*flex-direction: column; /* Stack the content vertically */
+    justify-content: center; /* Vertically center the content */
+    align-items: center; /* Horizontally center the content */
+    min-height: 100vh; /* Ensure body takes up at least the full height */
+    padding: 20px;
+    margin: 0;
+    width: 100%;
+  }
+
+  /* .container, .normal-user-page, .admin-user-page 
+  {
+    width: 100%; /* Set width to 100% 
+    max-width: 1200px; 
+    margin: 0 auto; /*centres
+  } */
+  
+  /*LandingPage*/
+
+  #container 
+  {
+    background: linear-gradient(to right, #0f0f1a, #2e2e3d);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.5);
+    width: 450px;
+    text-align: center;
+  }
+  
+ .Landing-wrapper h1 
+  {
+    margin-bottom: 20px;
+    color: #7d5fff;
+  }
+  
+  .Landing-wrapper form 
+  {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* width: 200px; */
+
+  }
+  
+  .Landing-wrapper label 
+  {
+    display: block;
+    font-size: 14px;
+    margin-top: 10px;
+    color: white; /* #aaa; */
+    text-align: left;
+    width: 100%;
+  }
+  
+  .Landing-wrapper input 
+  {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    background: #333;
+    color: white;
+    font-size: 14px;
+  }
+  
+  .Landing-wrapper input::placeholder 
+  {
+    color: #888;
+  }
+  
+  .Landing-wrapper button, .LinkButton
+  {
+    width: 80%;
+    margin-top: 15px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: 0.3s;
+  }
+  
+  .Landing-wrapper button[type="submit"], .LinkButton
+  {
+    background: #4a90e2;
+    color: white;
+  }
+  
+ .Landing-wrapper button[type="submit"]:hover, .LinkButton:hover
+  {
+    background: #3572b0;
+  }
+  
+  .Landing-wrapper p 
+  {   
+    font-size: 18px;
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  
+  .LinkButton
+  {
+    text-decoration: none;
+    width: auto;
+    margin-top: 0px;
+    margin-left: 8px;
+     color: white; /* #7d5fff; */
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .Landing-wrapper p button:hover 
+  {
+    text-decoration: underline;
+  }
